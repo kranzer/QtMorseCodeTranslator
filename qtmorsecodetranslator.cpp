@@ -5,6 +5,7 @@
 #include <QDir>
 #include <QTextStream>
 #include <QMap>
+#include <QDebug>
 
 
 QtMorseCodeTranslator::QtMorseCodeTranslator(QWidget *parent) :
@@ -61,15 +62,34 @@ void QtMorseCodeTranslator::on_m_translateButton_clicked()
         QString morseText = (ui->m_inputText->toPlainText());
         QString englishText;
         QStringList words;
-        QStringList chars;
+        QString chars;
+        QStringList charList;
+        QString tempString = "";
         words = morseText.split("  ");
         for(int i = 0; i < words.size(); i++){
-            chars = words[i].split(" ");
-            for(int j = 0; j < chars.size(); j++){
-                englishText+=translateDictionary.key(chars[j]);
+            chars = words[i];
+            for(int j = 0; j < chars.length(); j++){
+                if(chars[j] =='-'||chars[j] == '.'||chars[j]==' '){
+                    tempString += chars[j];
+                }
+                else{
+                    chars.remove(j,1);
+                    j--;
+                }
             }
+            qDebug() << chars;
+            for(int j=0; j<chars.split(" ").length(); j++){
+                englishText+=translateDictionary.key(chars.split(" ")[j]);
+            }
+            /*
+            charList.append(tempString.split(" "));
+            for(int j = 0; j < charList.size(); j++){
+                englishText+=translateDictionary.key(charList[j]);
+            }*/
             englishText+=" ";
         }
+        englishText = englishText.toLower();
+        englishText[0] = englishText[0].toUpper();
         ui->m_outputText->setText(englishText);
     }
 
