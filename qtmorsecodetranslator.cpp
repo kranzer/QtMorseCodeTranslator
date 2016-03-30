@@ -63,7 +63,6 @@ void QtMorseCodeTranslator::on_m_translateButton_clicked()
         QString englishText;
         QStringList words;
         QString chars;
-        QStringList charList;
         QString tempString = "";
         words = morseText.split("  ");
         for(int i = 0; i < words.size(); i++){
@@ -77,7 +76,6 @@ void QtMorseCodeTranslator::on_m_translateButton_clicked()
                     j--;
                 }
             }
-            qDebug() << chars;
             for(int j=0; j<chars.split(" ").length(); j++){
                 englishText+=translateDictionary.key(chars.split(" ")[j]);
             }
