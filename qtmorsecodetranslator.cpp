@@ -13,6 +13,7 @@ QtMorseCodeTranslator::QtMorseCodeTranslator(QWidget *parent) :
     ui(new Ui::QtMorseCodeTranslator)
 {
     ui->setupUi(this);
+    ui->m_morseToEng->setChecked(true);
 }
 
 QtMorseCodeTranslator::~QtMorseCodeTranslator()
@@ -79,11 +80,6 @@ void QtMorseCodeTranslator::on_m_translateButton_clicked()
             for(int j=0; j<chars.split(" ").length(); j++){
                 englishText+=translateDictionary.key(chars.split(" ")[j]);
             }
-            /*
-            charList.append(tempString.split(" "));
-            for(int j = 0; j < charList.size(); j++){
-                englishText+=translateDictionary.key(charList[j]);
-            }*/
             englishText+=" ";
         }
         englishText = englishText.toLower();
