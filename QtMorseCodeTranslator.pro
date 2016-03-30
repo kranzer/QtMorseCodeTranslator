@@ -13,8 +13,10 @@ TEMPLATE = app
 
 
 SOURCES += main.cpp\
-        qtmorsecodetranslator.cpp
+        qtmorsecodetranslator.cpp \
+    translatemanager.cpp
 
-HEADERS  += qtmorsecodetranslator.h
+HEADERS  += qtmorsecodetranslator.h \
+    translatemanager.h
 
 FORMS    += qtmorsecodetranslator.ui

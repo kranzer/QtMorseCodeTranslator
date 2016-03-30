@@ -5,8 +5,7 @@
 #include <QDir>
 #include <QTextStream>
 #include <QMap>
-#include <QDebug>
-
+#include "translatemanager.h"
 
 QtMorseCodeTranslator::QtMorseCodeTranslator(QWidget *parent) :
     QWidget(parent),
@@ -19,6 +18,10 @@ QtMorseCodeTranslator::QtMorseCodeTranslator(QWidget *parent) :
 QtMorseCodeTranslator::~QtMorseCodeTranslator()
 {
     delete ui;
+}
+
+void QtMorseCodeTranslator::setOutputText(QString text){
+    ui->m_outputText->setText(text);
 }
 
 void QtMorseCodeTranslator::on_m_openFileButton_clicked()
@@ -38,74 +41,20 @@ void QtMorseCodeTranslator::on_m_openFileButton_clicked()
 
 void QtMorseCodeTranslator::on_m_translateButton_clicked()
 {
-    QStringList englishChars;
-    englishChars << "A" << "B" << "C" << "D" << "E"
-                 << "F" << "G" << "H" << "I" << "J"
-                 << "K" << "L" << "M" << "N" << "O"
-                 << "P" << "Q" << "R" << "S" << "T"
-                 << "U" << "V" << "W" << "X" << "Y"
-                 << "Z";
-
-    QStringList morseChars;
-    morseChars   << ".-"   << "-..." << "-.-." << "-.." << "."
-                 << "..-." << "--."  << "...." << ".."  << ".---"
-                 << "-.-"  << ".-.." << "--"   << "-."  << "---"
-                 << ".--." << "--.-" << ".-." << "..."  << "-"
-                 << "..-"  << "...-" << ".--" << "-..-" << "-.--"
-                 << "--..";
-    QMap<QString,QString> translateDictionary;
-
-    for(int i = 0; i < englishChars.size(); i++){
-        translateDictionary.insert(englishChars[i], morseChars[i]);
+    translateManager* translator = new translateManager();
+    if(ui->m_engToMorse->isChecked()){
+        emit signEngToMorse(ui->m_inputText->toPlainText());
     }
-
-    if(ui->m_morseToEng->isChecked()){
-        QString morseText = (ui->m_inputText->toPlainText());
-        QString englishText;
-        QStringList words;
-        QString chars;
-        QString tempString = "";
-        words = morseText.split("  ");
-        for(int i = 0; i < words.size(); i++){
-            chars = words[i];
-            for(int j = 0; j < chars.length(); j++){
-                if(chars[j] =='-'||chars[j] == '.'||chars[j]==' '){
-                    tempString += chars[j];
-                }
-                else{
-                    chars.remove(j,1);
-                    j--;
-                }
-            }
-            for(int j=0; j<chars.split(" ").length(); j++){
-                englishText+=translateDictionary.key(chars.split(" ")[j]);
-            }
-            englishText+=" ";
-        }
-        englishText = englishText.toLower();
-        englishText[0] = englishText[0].toUpper();
-        ui->m_outputText->setText(englishText);
+    else if(ui->m_morseToEng->isChecked()){
+        emit signMorseToEng(ui->m_inputText->toPlainText());
     }
+    connect(this, SIGNAL(signEngToMorse(QString)),
+            translator, SLOT(engToMorse(QString)));
+    connect(this, SIGNAL(signMorseToEng(QString)),
+            translator, SLOT(morseToEng(QString)));
+    connect(translator, SIGNAL(signGotText(QString)),
+            this, SLOT(setOutputText(QString)));
 
-    else if(ui->m_engToMorse->isChecked()){
-        QString englishText = ui->m_inputText->toPlainText().toUpper();
-        QString morseText;
-        QStringList words;
-        words = englishText.split(" ");
-        for(int i = 0; i < words.size(); i++){
-            QList<QChar> chars;
-            for(int j = 0; j < words[i].length(); j++){
-                chars << words[i][j];
-            }
-            for(int j = 0; j < chars.size(); j++){
-                morseText+=translateDictionary.value(chars[j]);
-                morseText+=" ";
-            }
-
-            morseText+="  ";
-        }
-        ui->m_outputText->setText(morseText);
-    }
 
 }
 
