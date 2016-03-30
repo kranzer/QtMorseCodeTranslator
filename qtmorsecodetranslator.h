@@ -2,6 +2,7 @@
 #define QTMORSECODETRANSLATOR_H
 #include <QObject>
 #include <QWidget>
+#include "translatemanager.h"
 
 namespace Ui {
 class QtMorseCodeTranslator;
@@ -11,6 +12,8 @@ class QtMorseCodeTranslator : public QWidget
 {
     Q_OBJECT
 
+private:
+    translateManager* translator;
 public:
     explicit QtMorseCodeTranslator(QWidget *parent = 0);
     ~QtMorseCodeTranslator();

@@ -4,8 +4,6 @@
 #include <QFile>
 #include <QDir>
 #include <QTextStream>
-#include <QMap>
-#include "translatemanager.h"
 
 QtMorseCodeTranslator::QtMorseCodeTranslator(QWidget *parent) :
     QWidget(parent),
@@ -41,25 +39,25 @@ void QtMorseCodeTranslator::on_m_openFileButton_clicked()
 
 void QtMorseCodeTranslator::on_m_translateButton_clicked()
 {
-    translateManager* translator = new translateManager();
+    translator = new translateManager();
     if(ui->m_engToMorse->isChecked()){
         emit signEngToMorse(ui->m_inputText->toPlainText());
+        connect(this, SIGNAL(signEngToMorse(QString)),
+                translator, SLOT(engToMorse(QString)));
     }
     else if(ui->m_morseToEng->isChecked()){
         emit signMorseToEng(ui->m_inputText->toPlainText());
+        connect(this, SIGNAL(signMorseToEng(QString)),
+                translator, SLOT(morseToEng(QString)));
     }
-    connect(this, SIGNAL(signEngToMorse(QString)),
-            translator, SLOT(engToMorse(QString)));
-    connect(this, SIGNAL(signMorseToEng(QString)),
-            translator, SLOT(morseToEng(QString)));
     connect(translator, SIGNAL(signGotText(QString)),
             this, SLOT(setOutputText(QString)));
-
-
 }
 
 void QtMorseCodeTranslator::on_m_saveResultButton_clicked()
 {
+    //Creating output file and writing
+    //the result into it
     QFile outputFile(QFileDialog::getSaveFileName(0,
                                                   tr("Save result to file"),
                                                   QDir::homePath(),
