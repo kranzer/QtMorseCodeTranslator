@@ -20,3 +20,6 @@ HEADERS  += qtmorsecodetranslator.h \
     translatemanager.h
 
 FORMS    += qtmorsecodetranslator.ui
+
+DISTFILES += \
+    config.txt

@@ -2,7 +2,10 @@
 #define TRANSLATEMANAGER_H
 #include <QMap>
 #include <QObject>
-
+#include <QFile>
+#include <QTextStream>
+#include <QFileDialog>
+#include <QMessageBox>
 
 class translateManager : public QObject
 {
@@ -17,8 +20,9 @@ signals:
     void signGotText(QString);
 
 public slots:
-    void engToMorse(QString);
-    void morseToEng(QString);
+    void toMorse(const QString&);
+    void fromMorse(const QString&);
+
 };
 
 #endif // TRANSLATEMANAGER_H

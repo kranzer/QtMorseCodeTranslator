@@ -2,71 +2,66 @@
 
 translateManager::translateManager() : QObject()
 {
-    QStringList englishChars;
-    englishChars << "A" << "B" << "C" << "D" << "E"
-                 << "F" << "G" << "H" << "I" << "J"
-                 << "K" << "L" << "M" << "N" << "O"
-                 << "P" << "Q" << "R" << "S" << "T"
-                 << "U" << "V" << "W" << "X" << "Y"
-                 << "Z";
-
-    QStringList morseChars;
-    morseChars   << ".-"   << "-..." << "-.-." << "-.." << "."
-                 << "..-." << "--."  << "...." << ".."  << ".---"
-                 << "-.-"  << ".-.." << "--"   << "-."  << "---"
-                 << ".--." << "--.-" << ".-." << "..."  << "-"
-                 << "..-"  << "...-" << ".--" << "-..-" << "-.--"
-                 << "--..";
-
-    for(int i = 0; i < englishChars.size(); i++){
-        translateDictionary.insert(englishChars[i], morseChars[i]);
+    //translator constructor
+    //user chooses his own configuration
+    QString fileName = QFileDialog::getOpenFileName(0,
+                                                    tr("Select your translate configuration"),
+                                                    QDir::homePath(),
+                                                    "Text files (*.txt)");
+    if(!fileName.isEmpty()){
+        QFile configFile(fileName);
+        if(!configFile.open(QIODevice::ReadOnly))
+            return;
+        QTextStream in(&configFile);
+        while (!in.atEnd())
+        {
+            QStringList ls;
+            ls = in.readLine().split("   ");
+            translateDictionary.insert(ls[0],ls[1]);
+        }
+        configFile.close();
     }
+
 }
 
-void translateManager::morseToEng(QString morseText){
-    QString englishText;
+void translateManager::fromMorse(const QString& morseText)
+{
+    //Morse to natural language translation algorithm
+    QString naturalText;
     QStringList words;
-    QString chars;
     QString tempString = "";
     words = morseText.split("  ");
     for(int i = 0; i < words.size(); i++){
-        chars = words[i];
-        for(int j = 0; j < chars.length(); j++){
-            if(chars[j] =='-'||chars[j] == '.'||chars[j]==' '){
-                tempString += chars[j];
+        for(int j = 0; j < words[i].length(); j++){
+            if(words[i][j] =='-'||words[i][j] == '.'||words[i][j]==' '){
+                tempString += words[i][j];
             }
             else{
-                chars.remove(j,1);
+                words[i].remove(j,1);
                 j--;
             }
         }
-        for(int j=0; j<chars.split(" ").length(); j++){
-            englishText+=translateDictionary.key(chars.split(" ")[j]);
+        for(int j=0; j<words[i].split(" ").length(); j++){
+            naturalText+=translateDictionary.key(words[i].split(" ")[j]);
         }
-        englishText+=" ";
+        naturalText+=" ";
     }
-    englishText = englishText.toLower();
-    englishText[0] = englishText[0].toUpper();
-    emit signGotText(englishText);
+    naturalText[0] = naturalText[0].toUpper();
+    emit signGotText(naturalText.trimmed());//send translated text
 }
 
-void translateManager::engToMorse(QString englishText){
+void translateManager::toMorse(const QString& naturalText)
+{
+    //natural language to Morse translation algorithm
     QString morseText;
     QStringList words;
-    words = englishText.split(" ");
+    words = naturalText.toLower().split(" ");
     for(int i = 0; i < words.size(); i++){
-        QList<QChar> chars;
-        for(int j = 0; j < words[i].length(); j++){
-            chars << words[i][j];
-        }
-        for(int j = 0; j < chars.size(); j++){
-            morseText+=translateDictionary.value(chars[j]);
+        for(int j = 0; j < words[i].size(); j++){
+            morseText+=translateDictionary.value(QString(words[i][j]));
             morseText+=" ";
         }
-
-        morseText+="  ";
+        morseText+=" ";
     }
-    emit signGotText(morseText);
+    emit signGotText(morseText.trimmed());//send translated text
 }
-
-

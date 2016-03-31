@@ -1,16 +1,24 @@
 #include "qtmorsecodetranslator.h"
 #include "ui_qtmorsecodetranslator.h"
-#include <QFileDialog>
-#include <QFile>
-#include <QDir>
-#include <QTextStream>
+
 
 QtMorseCodeTranslator::QtMorseCodeTranslator(QWidget *parent) :
     QWidget(parent),
     ui(new Ui::QtMorseCodeTranslator)
 {
+    m_translator = new translateManager();//initialization of translator
+
     ui->setupUi(this);
-    ui->m_morseToEng->setChecked(true);
+    ui->m_fromMorse->setChecked(true);//translation from Morse to natural language is by default
+
+    connect(this, SIGNAL(signToMorse(QString)),        //
+            m_translator, SLOT(toMorse(QString)));     // Processing text
+    connect(this, SIGNAL(signFromMorse(QString)),      //
+            m_translator, SLOT(fromMorse(QString)));   //
+
+    connect(m_translator, SIGNAL(signGotText(QString)),// Output of result into QTextEdit
+            this, SLOT(setOutputText(QString)));
+
 }
 
 QtMorseCodeTranslator::~QtMorseCodeTranslator()
@@ -18,7 +26,8 @@ QtMorseCodeTranslator::~QtMorseCodeTranslator()
     delete ui;
 }
 
-void QtMorseCodeTranslator::setOutputText(QString text){
+void QtMorseCodeTranslator::setOutputText(const QString& text)
+{
     ui->m_outputText->setText(text);
 }
 
@@ -39,19 +48,16 @@ void QtMorseCodeTranslator::on_m_openFileButton_clicked()
 
 void QtMorseCodeTranslator::on_m_translateButton_clicked()
 {
-    translator = new translateManager();
-    if(ui->m_engToMorse->isChecked()){
-        emit signEngToMorse(ui->m_inputText->toPlainText());
-        connect(this, SIGNAL(signEngToMorse(QString)),
-                translator, SLOT(engToMorse(QString)));
+    //sending natural text from QTextEdit for processing
+    if(ui->m_toMorse->isChecked()){
+        emit signToMorse(ui->m_inputText->toPlainText());
     }
-    else if(ui->m_morseToEng->isChecked()){
-        emit signMorseToEng(ui->m_inputText->toPlainText());
-        connect(this, SIGNAL(signMorseToEng(QString)),
-                translator, SLOT(morseToEng(QString)));
+    //sending Morse text from QTextEdit for processing
+    else if(ui->m_fromMorse->isChecked()){
+        emit signFromMorse(ui->m_inputText->toPlainText());
     }
-    connect(translator, SIGNAL(signGotText(QString)),
-            this, SLOT(setOutputText(QString)));
+
+
 }
 
 void QtMorseCodeTranslator::on_m_saveResultButton_clicked()
