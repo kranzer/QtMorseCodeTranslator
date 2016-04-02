@@ -16,8 +16,6 @@ class QtMorseCodeTranslator : public QWidget
 {
     Q_OBJECT
 
-private:
-    translateManager* m_translator;
 public:
     explicit QtMorseCodeTranslator(QWidget *parent = 0);
     ~QtMorseCodeTranslator();
@@ -37,6 +35,7 @@ private slots:
 
 private:
     Ui::QtMorseCodeTranslator *ui;
+    translateManager* m_translator;
 };
 
 #endif // QTMORSECODETRANSLATOR_H
